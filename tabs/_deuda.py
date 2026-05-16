@@ -10,6 +10,41 @@ from racing import cuotas, ui
 from racing.formato import fmt_ars, fmt_usd
 
 
+def _detalle_cuotas(cuotas_list: list[dict], fmt) -> str:
+    """Tabla compacta con cada cuota: fecha, estado, abonado y pendiente."""
+    hoy = date.today()
+
+    def _key(c):
+        f = cuotas.parse_fecha_cuota(c)
+        return (0, f) if f else (1, date.max)
+
+    filas = []
+    for c in sorted(cuotas_list, key=_key):
+        f = cuotas.parse_fecha_cuota(c)
+        ab = c.get("Cuota Abonada", 0) or 0
+        pe = c.get("Cuota Pendiente", 0) or 0
+        if pe <= 0 and ab > 0:
+            est, cls = "Pagada", "pos"
+        elif pe > 0 and f and f < hoy:
+            est, cls = "Vencida", "neg"
+        elif pe > 0:
+            est, cls = "Pendiente", "warn"
+        else:
+            est, cls = "—", "dim"
+        fecha = f.strftime("%d/%m/%y") if f else "—"
+        cuota_lbl = ui._esc(c.get("Cuotas") or "—")
+        filas.append(
+            f'<tr><td>{cuota_lbl}</td><td>{fecha}</td>'
+            f'<td class="{cls}">{est}</td>'
+            f'<td class="r">{fmt(ab) if ab else "—"}</td>'
+            f'<td class="r">{fmt(pe) if pe else "—"}</td></tr>')
+    return (
+        f'<details class="cuotas-det"><summary></summary>'
+        f'<table class="rc-mini"><thead><tr><th>Cuota</th><th>Fecha</th>'
+        f'<th>Estado</th><th class="r">Abonado</th><th class="r">Pend.</th>'
+        f'</tr></thead><tbody>{"".join(filas)}</tbody></table></details>')
+
+
 def _card(g: dict, fmt, accent: str) -> str:
     pct = round(g["pagas"] / g["total_cuotas"] * 100) if g["total_cuotas"] else 0
     cat = g["categoria"]
@@ -49,7 +84,8 @@ def _card(g: dict, fmt, accent: str) -> str:
         f'<div class="progress-bar"><div class="progress-fill" '
         f'style="width:{pct}%;background:{fill}"></div></div>'
         f'<div class="progress-label"><span>{pct}% pagado</span></div>'
-        f'{estado}</div>'
+        f'{estado}'
+        f'{_detalle_cuotas(g.get("cuotas", []), fmt)}</div>'
     )
 
 

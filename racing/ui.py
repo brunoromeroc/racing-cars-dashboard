@@ -74,15 +74,36 @@ table.rc tbody tr:hover { background: var(--surface2); }
 .deuda-grid { display: grid; gap: 12px;
   grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
 .deuda-card { background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 16px; }
-.deuda-card .cliente { font-size: 1rem; font-weight: 600; }
-.deuda-card .vehiculo { font-size: 0.85rem; color: var(--dim); margin-top: 2px; }
-.deuda-card .monto { font-size: 1.2rem; font-weight: 600; text-align: right; }
-.deuda-card .stats { display: flex; gap: 12px; margin: 12px 0 4px;
-  padding: 8px; background: var(--bg); border-radius: 6px; font-size: 0.8rem; }
+  border-radius: 12px; padding: 13px; }
+.deuda-card .cliente { font-size: 0.9rem; font-weight: 600; line-height: 1.25; }
+.deuda-card .vehiculo { font-size: 0.78rem; color: var(--dim); margin-top: 1px; }
+.deuda-card .monto { font-size: 1.02rem; font-weight: 600; text-align: right;
+  white-space: nowrap; }
+.deuda-card .stats { display: flex; gap: 8px; margin: 10px 0 4px;
+  padding: 7px; background: var(--bg); border-radius: 6px; font-size: 0.74rem; }
 .deuda-card .stat { flex: 1; text-align: center; }
-.deuda-card .stat .l { color: var(--dim); font-size: 0.7rem; text-transform: uppercase; }
-.deuda-card .stat .v { font-weight: 600; margin-top: 2px; }
+.deuda-card .stat .l { color: var(--dim); font-size: 0.64rem;
+  text-transform: uppercase; }
+.deuda-card .stat .v { font-weight: 600; margin-top: 2px; font-size: 0.8rem; }
+
+/* Desplegable de detalle de cuotas dentro de cada card */
+.cuotas-det { margin-top: 8px; border-top: 1px solid var(--border);
+  padding-top: 6px; }
+.cuotas-det > summary { cursor: pointer; list-style: none; font-size: 0.74rem;
+  color: var(--dim); user-select: none; padding: 2px 0; }
+.cuotas-det > summary::-webkit-details-marker { display: none; }
+.cuotas-det > summary::before { content: "\25B8  Ver cuotas"; }
+.cuotas-det[open] > summary::before { content: "\25BE  Ocultar cuotas"; }
+.cuotas-det > summary:hover { color: var(--accent); }
+table.rc-mini { width: 100%; border-collapse: collapse; margin-top: 6px;
+  font-size: 0.7rem; }
+table.rc-mini th { color: var(--dim); font-weight: 500; text-align: left;
+  padding: 4px 6px; border-bottom: 1px solid var(--border);
+  text-transform: uppercase; font-size: 0.62rem; letter-spacing: 0.4px; }
+table.rc-mini td { padding: 4px 6px; border-bottom: 1px solid var(--border);
+  font-variant-numeric: tabular-nums; }
+table.rc-mini td.r, table.rc-mini th.r { text-align: right; }
+table.rc-mini tr:last-child td { border-bottom: none; }
 .progress-bar { height: 8px; background: var(--bg); border-radius: 4px;
   overflow: hidden; border: 1px solid var(--border); margin: 10px 0 4px; }
 .progress-fill { height: 100%; }
