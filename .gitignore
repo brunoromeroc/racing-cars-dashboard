@@ -1,0 +1,27 @@
+# Credenciales / secretos -- NUNCA subir
+.streamlit/secrets.toml
+service_account.json
+*.pem
+.env
+
+# Datos locales de desarrollo (xlsx reales de Drive)
+data/*.xlsx
+data/*.xls
+
+# Snapshot con datos financieros reales de Kevin: NO versionar (repo publico).
+# Se mantiene solo local; ya se uso para crear las tabs Dash_ de la planilla.
+tools/snapshot_inversion.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Config local de Claude Code (no es del proyecto)
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
