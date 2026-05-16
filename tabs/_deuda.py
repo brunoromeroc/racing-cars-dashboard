@@ -39,7 +39,8 @@ def _detalle_cuotas(cuotas_list: list[dict], fmt) -> str:
             f'<td class="r">{fmt(ab) if ab else "—"}</td>'
             f'<td class="r">{fmt(pe) if pe else "—"}</td></tr>')
     return (
-        f'<details class="cuotas-det"><summary></summary>'
+        f'<details class="cuotas-det"><summary><span class="cd-ar"></span>'
+        f'Ver {len(cuotas_list)} cuotas</summary>'
         f'<table class="rc-mini"><thead><tr><th>Cuota</th><th>Fecha</th>'
         f'<th>Estado</th><th class="r">Abonado</th><th class="r">Pend.</th>'
         f'</tr></thead><tbody>{"".join(filas)}</tbody></table></details>')
@@ -50,41 +51,42 @@ def _card(g: dict, fmt, accent: str) -> str:
     cat = g["categoria"]
     fill = "#ff4444" if cat == "vencidos" else (
         "#00ff88" if cat == "realizados" else "#ffaa00")
-    monto_color = "#00ff88" if cat == "realizados" else accent
-    monto = g["pagado"] if cat == "realizados" else g["pendiente"]
 
-    if cat == "vencidos":
-        estado = (f'<div class="estado-line"><span class="neg">'
-                  f'{g["vencidas"]} vencida{"s" if g["vencidas"] > 1 else ""}'
-                  f'</span></div>')
-    elif cat == "pendientes" and g["proxima_fecha"]:
-        dp = g["dias_proximo"]
-        txt = ("HOY" if dp == 0 else "mañana" if dp == 1 else f"en {dp} días")
-        cls = "warn" if (dp is not None and dp <= 7) else "dim"
-        estado = (f'<div class="estado-line"><span class="dim">Próximo: '
-                  f'</span><strong>{g["proxima_fecha"].strftime("%d/%m/%y")}'
-                  f'</strong> · <span class="{cls}">{txt}</span></div>')
+    if cat == "realizados":
+        monto, monto_color, monto_lbl = g["pagado"], "#00ff88", "pagado"
+        est_html = '<span class="est pos">Saldado</span>'
     else:
-        estado = '<div class="estado-line"><span class="pos">Al día</span></div>'
+        monto, monto_color, monto_lbl = g["pendiente"], accent, "pendiente"
+        if cat == "vencidos":
+            n = g["vencidas"]
+            est_html = (f'<span class="est neg">{n} cuota'
+                        f'{"s" if n > 1 else ""} vencida'
+                        f'{"s" if n > 1 else ""}</span>')
+        elif g["proxima_fecha"]:
+            dp = g["dias_proximo"]
+            txt = ("hoy" if dp == 0 else "mañana" if dp == 1
+                   else f"en {dp}d")
+            cls = "warn" if (dp is not None and dp <= 7) else "dim"
+            est_html = (f'<span class="est {cls}">Próx. '
+                        f'{g["proxima_fecha"].strftime("%d/%m")} ({txt})'
+                        f'</span>')
+        else:
+            est_html = '<span class="est pos">Al día</span>'
+
+    meta_izq = (f'{g["pagas"]}/{g["total_cuotas"]} cuotas · {pct}% · '
+                f'pagó {fmt(g["pagado"])}')
 
     return (
         f'<div class="deuda-card">'
-        f'<div style="display:flex;justify-content:space-between;gap:8px">'
-        f'<div><div class="cliente">{g["cliente"]}</div>'
-        f'<div class="vehiculo">{g["vehiculo"]}</div></div>'
-        f'<div class="monto" style="color:{monto_color}">{fmt(monto)}</div>'
+        f'<div class="dc-head">'
+        f'<div><div class="cliente">{ui._esc(g["cliente"])}</div>'
+        f'<div class="vehiculo">{ui._esc(g["vehiculo"])}</div></div>'
+        f'<div class="monto" style="color:{monto_color}">{fmt(monto)}'
+        f'<span class="ml">{monto_lbl}</span></div>'
         f'</div>'
-        f'<div class="stats">'
-        f'<div class="stat"><div class="l">Cuotas</div>'
-        f'<div class="v">{g["pagas"]}/{g["total_cuotas"]}</div></div>'
-        f'<div class="stat"><div class="l">Pagado</div>'
-        f'<div class="v pos">{fmt(g["pagado"])}</div></div>'
-        f'<div class="stat"><div class="l">Pendiente</div>'
-        f'<div class="v">{fmt(g["pendiente"])}</div></div></div>'
         f'<div class="progress-bar"><div class="progress-fill" '
         f'style="width:{pct}%;background:{fill}"></div></div>'
-        f'<div class="progress-label"><span>{pct}% pagado</span></div>'
-        f'{estado}'
+        f'<div class="dc-meta"><span>{meta_izq}</span>{est_html}</div>'
         f'{_detalle_cuotas(g.get("cuotas", []), fmt)}</div>'
     )
 
@@ -145,11 +147,20 @@ def render_deuda(ctx: dict, tipo: str) -> None:
     col = (_columna("Vencidos", fmt(g["total_vencidos"]), g["vencidos"], fmt,
                     accent)
            + _columna("En fecha", fmt(g["total_pendientes"]), g["pendientes"],
-                      fmt, accent)
-           + _columna("Realizados", fmt(g["total_realizados"]),
-                      g["realizados"], fmt, accent))
-    ui.html(f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;'
+                      fmt, accent))
+    ui.html(f'<div style="display:grid;grid-template-columns:1fr 1fr;'
             f'gap:16px">{col}</div>')
+
+    realizados = g["realizados"]
+    if realizados:
+        with st.expander(f"Ver {len(realizados)} cuentas 100% pagadas "
+                         f"({fmt(g['total_realizados'])} cobrado)"
+                         if es_cobro else
+                         f"Ver {len(realizados)} cuentas 100% pagadas "
+                         f"({fmt(g['total_realizados'])} pagado)",
+                         expanded=False):
+            cards = "".join(_card(x, fmt, accent) for x in realizados)
+            ui.html(f'<div class="deuda-grid">{cards}</div>')
 
     q = st.text_input("Buscar", placeholder=f"Buscar {quien} o vehículo",
                       label_visibility="collapsed", key=f"{tipo}_q").lower()

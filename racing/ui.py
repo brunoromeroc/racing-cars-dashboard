@@ -74,26 +74,32 @@ table.rc tbody tr:hover { background: var(--surface2); }
 .deuda-grid { display: grid; gap: 12px;
   grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
 .deuda-card { background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 13px; }
-.deuda-card .cliente { font-size: 0.9rem; font-weight: 600; line-height: 1.25; }
-.deuda-card .vehiculo { font-size: 0.78rem; color: var(--dim); margin-top: 1px; }
-.deuda-card .monto { font-size: 1.02rem; font-weight: 600; text-align: right;
-  white-space: nowrap; }
-.deuda-card .stats { display: flex; gap: 8px; margin: 10px 0 4px;
-  padding: 7px; background: var(--bg); border-radius: 6px; font-size: 0.74rem; }
-.deuda-card .stat { flex: 1; text-align: center; }
-.deuda-card .stat .l { color: var(--dim); font-size: 0.64rem;
-  text-transform: uppercase; }
-.deuda-card .stat .v { font-weight: 600; margin-top: 2px; font-size: 0.8rem; }
+  border-radius: 10px; padding: 12px 13px; }
+.deuda-card .dc-head { display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 10px; }
+.deuda-card .cliente { font-size: 0.9rem; font-weight: 600; line-height: 1.2; }
+.deuda-card .vehiculo { font-size: 0.76rem; color: var(--dim);
+  margin-top: 1px; }
+.deuda-card .monto { font-size: 1.05rem; font-weight: 700; text-align: right;
+  white-space: nowrap; line-height: 1.1; }
+.deuda-card .monto .ml { display: block; font-size: 0.6rem; font-weight: 500;
+  color: var(--dim); text-transform: uppercase; letter-spacing: 0.4px; }
+.deuda-card .dc-meta { display: flex; justify-content: space-between;
+  align-items: baseline; gap: 8px; margin-top: 5px; font-size: 0.72rem;
+  color: var(--dim); }
+.deuda-card .dc-meta .est { font-weight: 600; white-space: nowrap; }
 
 /* Desplegable de detalle de cuotas dentro de cada card */
 .cuotas-det { margin-top: 8px; border-top: 1px solid var(--border);
-  padding-top: 6px; }
-.cuotas-det > summary { cursor: pointer; list-style: none; font-size: 0.74rem;
-  color: var(--dim); user-select: none; padding: 2px 0; }
+  padding-top: 5px; }
+.cuotas-det > summary { cursor: pointer; list-style: none; font-size: 0.72rem;
+  color: var(--dim); user-select: none; padding: 2px 0;
+  display: flex; align-items: center; gap: 7px; }
 .cuotas-det > summary::-webkit-details-marker { display: none; }
-.cuotas-det > summary::before { content: "\25B8  Ver cuotas"; }
-.cuotas-det[open] > summary::before { content: "\25BE  Ocultar cuotas"; }
+.cuotas-det > summary .cd-ar { width: 0; height: 0; flex: none;
+  border-left: 5px solid currentColor; border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent; transition: transform .15s; }
+.cuotas-det[open] > summary .cd-ar { transform: rotate(90deg); }
 .cuotas-det > summary:hover { color: var(--accent); }
 table.rc-mini { width: 100%; border-collapse: collapse; margin-top: 6px;
   font-size: 0.7rem; }
