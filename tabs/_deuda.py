@@ -148,8 +148,7 @@ def render_deuda(ctx: dict, tipo: str) -> None:
                     accent)
            + _columna("En fecha", fmt(g["total_pendientes"]), g["pendientes"],
                       fmt, accent))
-    ui.html(f'<div style="display:grid;grid-template-columns:1fr 1fr;'
-            f'gap:16px">{col}</div>')
+    ui.html(f'<div class="deuda-cols">{col}</div>')
 
     realizados = g["realizados"]
     if realizados:

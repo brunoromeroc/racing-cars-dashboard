@@ -124,6 +124,49 @@ table.rc-mini tr:last-child td { border-bottom: none; }
   color: var(--accent) !important; }
 div[data-testid="stDataFrame"] { border: 1px solid var(--border);
   border-radius: 10px; }
+
+/* Dolar blue: oculto en desktop (esta en la sidebar), visible en mobile */
+.rc-dolar-m { display: none; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  margin-top: 12px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 14px; font-size: 0.82rem; color: var(--dim); }
+.rc-dolar-m strong { color: var(--accent); font-size: 1.05rem; font-weight: 700; }
+.rc-dolar-m span { color: var(--dim); font-size: 0.72rem; }
+/* Columnas Vencidos / En fecha (Cobros y Pagos) */
+.deuda-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ---- Optimizacion mobile (iPhone / pantallas chicas) ---- */
+@media (max-width: 640px) {
+  .block-container { padding: 3rem 0.7rem 2.5rem !important; }
+  .rc-h1 { font-size: 1.35rem; line-height: 1.25; }
+  .rc-sub { font-size: 0.78rem; }
+  h2, .rc-h2 { font-size: 1.05rem; margin: 14px 0 6px; }
+  h3, .rc-h3 { font-size: 0.95rem; }
+
+  .grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
+  .metric { padding: 13px 14px; }
+  .metric .value { font-size: 1.3rem; }
+  .card { padding: 15px 14px; }
+
+  .deuda-grid, .deuda-cols { grid-template-columns: 1fr; gap: 12px; }
+
+  /* Tablas: scroll horizontal en vez de columnas aplastadas */
+  .rc-tw { overflow-x: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border); border-radius: 10px; }
+  .rc-tw table.rc { min-width: 540px; }
+
+  /* Tabs: barra deslizable horizontal, targets mas grandes */
+  .stTabs [data-baseweb="tab-list"] { flex-wrap: nowrap; overflow-x: auto;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar { display: none; }
+  .stTabs [data-baseweb="tab"] { flex: 0 0 auto; white-space: nowrap;
+    padding: 9px 14px; font-size: 0.9rem; }
+
+  /* Control para abrir la sidebar (dólar / Refrescar) bien visible */
+  [data-testid="stSidebarCollapsedControl"] { background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; }
+
+  .rc-dolar-m { display: flex; }
+}
 </style>
 """
 
@@ -169,9 +212,8 @@ def tabla(headers: list, filas: list[list], clases_col: list[str] | None = None,
             for i, c in enumerate(fila))
         body += f"<tr>{tds}</tr>"
     t = f'<table class="rc"><thead><tr>{th}</tr></thead><tbody>{body}</tbody></table>'
-    if scroll:
-        t = f'<div class="scroll-table">{t}</div>'
-    st.markdown(t, unsafe_allow_html=True)
+    cls = "scroll-table rc-tw" if scroll else "rc-tw"
+    st.markdown(f'<div class="{cls}">{t}</div>', unsafe_allow_html=True)
 
 
 def color_span(value: str, cls: str) -> str:

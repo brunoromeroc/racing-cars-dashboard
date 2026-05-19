@@ -13,7 +13,7 @@ from tabs import (analisis as t_analisis, caja as t_caja, calendario as t_cal,
                   pagos as t_pagos, resumen as t_resumen, stock as t_stock)
 
 st.set_page_config(page_title="Racing Cars · Dashboard", page_icon="🏁",
-                   layout="wide", initial_sidebar_state="expanded")
+                   layout="wide", initial_sidebar_state="auto")
 ui.inyectar_css()
 
 
@@ -60,10 +60,16 @@ def main() -> None:
                     "service account (ver RUNBOOK.md).")
         st.stop()
 
+    dolar_m = ""
+    if blue:
+        dolar_m = (f'<div class="rc-dolar-m">Dólar blue (venta) '
+                   f'<strong>$ {blue["venta"]:,.0f}</strong>'
+                   f'<span>{serie.get("ultima_fecha", "")} · '
+                   f'argentinadatos.com</span></div>').replace(",", ".")
     ui.html('<div class="rc-h1">Racing Cars · Dashboard</div>'
             f'<div class="rc-sub">Salud financiera del negocio · fuente: '
             f'Google Sheets {"(en vivo)" if modo == "vivo" else "(local)"}'
-            f'</div>')
+            f'</div>{dolar_m}')
 
     if not data_inversion.hay_datos(inv):
         ui.html('<div class="warning-banner"><strong>Falta setup de '
