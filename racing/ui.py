@@ -134,38 +134,57 @@ div[data-testid="stDataFrame"] { border: 1px solid var(--border);
 /* Columnas Vencidos / En fecha (Cobros y Pagos) */
 .deuda-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-/* ---- Optimizacion mobile (iPhone / pantallas chicas) ---- */
+/* ---- Optimizacion mobile: maxima densidad de info en pantalla ---- */
 @media (max-width: 640px) {
-  .block-container { padding: 3rem 0.7rem 2.5rem !important; }
-  .rc-h1 { font-size: 1.35rem; line-height: 1.25; }
-  .rc-sub { font-size: 0.78rem; }
-  h2, .rc-h2 { font-size: 1.05rem; margin: 14px 0 6px; }
-  h3, .rc-h3 { font-size: 0.95rem; }
+  .block-container { padding: 2.6rem 0.55rem 1.4rem !important; }
+  .rc-h1 { font-size: 1.15rem; line-height: 1.2; }
+  .rc-sub { font-size: 0.7rem; margin-top: 2px; }
+  h2, .rc-h2 { font-size: 0.92rem; margin: 11px 0 5px; }
+  h3, .rc-h3 { font-size: 0.82rem; margin: 9px 0 5px; }
+  .fuente { font-size: 0.66rem; margin: 3px 0; }
+  .muted-row { font-size: 0.74rem; margin: 5px 0; }
 
-  .grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
-  .metric { padding: 13px 14px; }
-  .metric .value { font-size: 1.3rem; }
-  .card { padding: 15px 14px; }
+  /* Dolar: chip compacto arriba */
+  .rc-dolar-m { display: flex; margin-top: 7px; padding: 5px 9px;
+    font-size: 0.7rem; gap: 5px; border-radius: 8px; }
+  .rc-dolar-m strong { font-size: 0.88rem; }
+  .rc-dolar-m span { font-size: 0.62rem; }
 
-  .deuda-grid, .deuda-cols { grid-template-columns: 1fr; gap: 12px; }
+  /* Metricas: 2 columnas, padding y tipografia chicos */
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 7px; margin-bottom: 10px; }
+  .metric { padding: 8px 9px; border-radius: 9px; }
+  .metric .label { font-size: 0.64rem; margin-bottom: 2px; line-height: 1.15; }
+  .metric .value { font-size: 0.98rem; line-height: 1.15; }
+  .metric .delta { font-size: 0.62rem; margin-top: 2px; }
+  .card { padding: 10px 11px; margin-bottom: 9px; }
 
-  /* Tablas: scroll horizontal en vez de columnas aplastadas */
+  /* Cards de deuda mas compactas */
+  .deuda-grid, .deuda-cols { grid-template-columns: 1fr; gap: 8px; }
+  .deuda-card { padding: 8px 10px; }
+  .deuda-card .cliente { font-size: 0.82rem; }
+  .deuda-card .vehiculo { font-size: 0.68rem; }
+  .deuda-card .monto { font-size: 0.92rem; }
+  .deuda-card .monto .ml { font-size: 0.55rem; }
+  .deuda-card .dc-meta { font-size: 0.64rem; margin-top: 4px; }
+  .progress-bar { height: 6px; margin: 7px 0 3px; }
+
+  /* Tablas: scroll horizontal, celdas compactas */
   .rc-tw { overflow-x: auto; -webkit-overflow-scrolling: touch;
-    border: 1px solid var(--border); border-radius: 10px; }
-  .rc-tw table.rc { min-width: 540px; }
+    border: 1px solid var(--border); border-radius: 9px; }
+  .rc-tw table.rc { min-width: 460px; font-size: 0.74rem; }
+  .rc-tw table.rc th, .rc-tw table.rc td { padding: 6px 8px; }
+  .rc-tw table.rc th { font-size: 0.62rem; }
 
-  /* Tabs: barra deslizable horizontal, targets mas grandes */
+  /* Tabs: barra deslizable, compacta */
   .stTabs [data-baseweb="tab-list"] { flex-wrap: nowrap; overflow-x: auto;
-    -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 4px; }
   .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar { display: none; }
   .stTabs [data-baseweb="tab"] { flex: 0 0 auto; white-space: nowrap;
-    padding: 9px 14px; font-size: 0.9rem; }
+    padding: 6px 11px; font-size: 0.8rem; }
 
   /* Control para abrir la sidebar (dólar / Refrescar) bien visible */
   [data-testid="stSidebarCollapsedControl"] { background: var(--surface);
     border: 1px solid var(--border); border-radius: 8px; }
-
-  .rc-dolar-m { display: flex; }
 }
 </style>
 """
@@ -173,6 +192,52 @@ div[data-testid="stDataFrame"] { border: 1px solid var(--border);
 
 def inyectar_css() -> None:
     st.markdown(CSS, unsafe_allow_html=True)
+
+
+_PWA_TAGS = [
+    ('link', {'rel': 'apple-touch-icon', 'href': 'app/static/apple-touch-icon.png'}),
+    ('link', {'rel': 'icon', 'href': 'app/static/icon-192.png'}),
+    ('link', {'rel': 'manifest', 'href': 'app/static/manifest.json'}),
+    ('meta', {'name': 'apple-mobile-web-app-capable', 'content': 'yes'}),
+    ('meta', {'name': 'mobile-web-app-capable', 'content': 'yes'}),
+    ('meta', {'name': 'apple-mobile-web-app-status-bar-style', 'content': 'black'}),
+    ('meta', {'name': 'apple-mobile-web-app-title', 'content': 'Racing Cars'}),
+    ('meta', {'name': 'theme-color', 'content': '#0a0a0a'}),
+]
+
+
+def inyectar_pwa() -> None:
+    """Mete las meta/link tags al <head> para que en iPhone se pueda
+    'Agregar a pantalla de inicio' y abra fullscreen con icono propio.
+    Streamlit no expone el <head>, asi que se inyecta desde el documento
+    padre via un componente (idempotente ante reruns)."""
+    import json
+
+    import streamlit.components.v1 as components
+
+    js = f"""
+    <script>
+    (function() {{
+      try {{
+        var d = window.parent.document;
+        var tags = {json.dumps(_PWA_TAGS)};
+        tags.forEach(function(t) {{
+          var tag = t[0], attrs = t[1];
+          var sel = tag + '[data-rc-pwa="' +
+            (attrs.rel || attrs.name) + '"]';
+          if (d.head.querySelector(sel)) return;
+          var el = d.createElement(tag);
+          Object.keys(attrs).forEach(function(k) {{
+            el.setAttribute(k, attrs[k]);
+          }});
+          el.setAttribute('data-rc-pwa', attrs.rel || attrs.name);
+          d.head.appendChild(el);
+        }});
+      }} catch (e) {{ /* cross-origin: no-op */ }}
+    }})();
+    </script>
+    """
+    components.html(js, height=0, width=0)
 
 
 def _esc(s) -> str:

@@ -15,6 +15,7 @@ from tabs import (analisis as t_analisis, caja as t_caja, calendario as t_cal,
 st.set_page_config(page_title="Racing Cars · Dashboard", page_icon="🏁",
                    layout="wide", initial_sidebar_state="auto")
 ui.inyectar_css()
+ui.inyectar_pwa()
 
 
 @st.cache_data(ttl=600, show_spinner="Cargando datos de Drive...")
