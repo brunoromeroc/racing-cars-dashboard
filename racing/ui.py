@@ -80,14 +80,35 @@ table.rc tbody tr:hover { background: var(--surface2); }
 .deuda-card .cliente { font-size: 0.9rem; font-weight: 600; line-height: 1.2; }
 .deuda-card .vehiculo { font-size: 0.76rem; color: var(--dim);
   margin-top: 1px; }
-.deuda-card .monto { font-size: 1.05rem; font-weight: 700; text-align: right;
+.deuda-card .dc-id { min-width: 0; }
+.deuda-card .dc-mt { text-align: right; flex: none; }
+.deuda-card .monto { font-size: 1.05rem; font-weight: 700;
   white-space: nowrap; line-height: 1.1; }
 .deuda-card .monto .ml { display: block; font-size: 0.6rem; font-weight: 500;
   color: var(--dim); text-transform: uppercase; letter-spacing: 0.4px; }
+.deuda-card .dc-sub { font-size: 0.66rem; line-height: 1.3; margin-top: 4px;
+  color: var(--dim); white-space: nowrap; }
+.deuda-card .dc-sub .venc { color: var(--negative); font-weight: 600; }
+.deuda-card .dc-sub .tot { color: var(--dim); }
 .deuda-card .dc-meta { display: flex; justify-content: space-between;
   align-items: baseline; gap: 8px; margin-top: 5px; font-size: 0.72rem;
   color: var(--dim); }
 .deuda-card .dc-meta .est { font-weight: 600; white-space: nowrap; }
+
+/* Top deudores / acreedores: barras HTML en mobile, Plotly en desktop */
+.top-bars-mobile { display: none; flex-direction: column; gap: 9px;
+  margin: 4px 0 12px; }
+.top-bars-mobile .tb-row { display: flex; flex-direction: column; gap: 3px; }
+.top-bars-mobile .tb-head { display: flex; justify-content: space-between;
+  align-items: baseline; gap: 8px; font-size: 0.78rem; }
+.top-bars-mobile .tb-name { color: var(--text); overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; }
+.top-bars-mobile .tb-val { font-weight: 600;
+  font-variant-numeric: tabular-nums; white-space: nowrap; }
+.top-bars-mobile .tb-bar { height: 6px; background: var(--bg);
+  border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+.top-bars-mobile .tb-fill { height: 100%; }
+.top-marker-plotly { display: none; }
 
 /* Desplegable de detalle de cuotas dentro de cada card */
 .cuotas-det { margin-top: 8px; border-top: 1px solid var(--border);
@@ -165,8 +186,16 @@ div[data-testid="stDataFrame"] { border: 1px solid var(--border);
   .deuda-card .vehiculo { font-size: 0.68rem; }
   .deuda-card .monto { font-size: 0.92rem; }
   .deuda-card .monto .ml { font-size: 0.55rem; }
+  .deuda-card .dc-sub { font-size: 0.6rem; margin-top: 2px; }
   .deuda-card .dc-meta { font-size: 0.64rem; margin-top: 4px; }
   .progress-bar { height: 6px; margin: 7px 0 3px; }
+
+  /* Top deudores: en mobile mostrar barras HTML y ocultar Plotly */
+  .top-bars-mobile { display: flex; }
+  [data-testid="stElementContainer"]:has(.top-marker-plotly)
+    + [data-testid="stElementContainer"] { display: none; }
+  [data-testid="element-container"]:has(.top-marker-plotly)
+    + [data-testid="element-container"] { display: none; }
 
   /* Tablas: scroll horizontal, celdas compactas */
   .rc-tw { overflow-x: auto; -webkit-overflow-scrolling: touch;

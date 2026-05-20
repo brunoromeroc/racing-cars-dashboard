@@ -53,10 +53,27 @@ def _card(g: dict, fmt, accent: str) -> str:
         "#00ff88" if cat == "realizados" else "#ffaa00")
 
     if cat == "realizados":
-        monto, monto_color, monto_lbl = g["pagado"], "#00ff88", "pagado"
+        monto_html = (
+            f'<div class="monto" style="color:#00ff88">{fmt(g["pagado"])}'
+            f'<span class="ml">pagado</span></div>'
+            f'<div class="dc-sub"><span class="tot">Total {fmt(g["pendiente"] + g["pagado"])}</span></div>'
+        )
         est_html = '<span class="est pos">Saldado</span>'
     else:
-        monto, monto_color, monto_lbl = g["pendiente"], accent, "pendiente"
+        prox = g.get("proxima_cuota") or 0
+        venc = g.get("monto_vencido") or 0
+        total = (g.get("pendiente") or 0) + (g.get("pagado") or 0)
+        big_color = "#ff4444" if cat == "vencidos" else accent
+        sub_parts = []
+        if venc > 0:
+            sub_parts.append(f'<span class="venc">Vencido {fmt(venc)}</span>')
+        sub_parts.append(f'<span class="tot">Total {fmt(total)}</span>')
+        monto_html = (
+            f'<div class="monto" style="color:{big_color}">'
+            f'{fmt(prox) if prox else fmt(g["pendiente"])}'
+            f'<span class="ml">{"próx. cuota" if prox else "pendiente"}</span></div>'
+            f'<div class="dc-sub">{" · ".join(sub_parts)}</div>'
+        )
         if cat == "vencidos":
             n = g["vencidas"]
             est_html = (f'<span class="est neg">{n} cuota'
@@ -79,10 +96,9 @@ def _card(g: dict, fmt, accent: str) -> str:
     return (
         f'<div class="deuda-card">'
         f'<div class="dc-head">'
-        f'<div><div class="cliente">{ui._esc(g["cliente"])}</div>'
+        f'<div class="dc-id"><div class="cliente">{ui._esc(g["cliente"])}</div>'
         f'<div class="vehiculo">{ui._esc(g["vehiculo"])}</div></div>'
-        f'<div class="monto" style="color:{monto_color}">{fmt(monto)}'
-        f'<span class="ml">{monto_lbl}</span></div>'
+        f'<div class="dc-mt">{monto_html}</div>'
         f'</div>'
         f'<div class="progress-bar"><div class="progress-fill" '
         f'style="width:{pct}%;background:{fill}"></div></div>'
@@ -130,6 +146,19 @@ def render_deuda(ctx: dict, tipo: str) -> None:
 
     top = d["top"]
     if top:
+        ui.html(f'<div class="rc-h3">Top {"deudores" if es_cobro else "acreedores"}</div>')
+        max_val = max((r["pendiente"] for r in top), default=0) or 1
+        rows_html = "".join(
+            f'<div class="tb-row">'
+            f'<div class="tb-head"><span class="tb-name">{ui._esc(r["Cliente"])}</span>'
+            f'<span class="tb-val" style="color:{accent}">{fmt(r["pendiente"])}</span></div>'
+            f'<div class="tb-bar"><div class="tb-fill" '
+            f'style="width:{r["pendiente"] / max_val * 100:.1f}%;'
+            f'background:{accent}"></div></div></div>'
+            for r in top
+        )
+        ui.html(f'<div class="top-bars-mobile">{rows_html}</div>')
+        ui.html('<div class="top-marker-plotly"></div>')
         fig = go.Figure(go.Bar(
             x=[r["pendiente"] for r in top], y=[r["Cliente"] for r in top],
             orientation="h", marker_color=accent,
@@ -137,7 +166,6 @@ def render_deuda(ctx: dict, tipo: str) -> None:
             hovertemplate="<b>%{y}</b><br>Debe: %{x:,.0f}<extra></extra>"))
         fig.update_yaxes(autorange="reversed")
         fig.update_xaxes(showticklabels=False)
-        ui.html(f'<div class="rc-h3">Top {"deudores" if es_cobro else "acreedores"}</div>')
         ui.plot(fig, height=max(360, len(top) * 34))
 
     g = cuotas.agrupar_deuda(d["detalle"], hoy=date.today())

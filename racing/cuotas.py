@@ -49,14 +49,18 @@ def agrupar_deuda(detalle: list[dict], hoy: date | None = None) -> dict:
                     if (c.get("Cuota Abonada", 0) or 0) > 0
                     and (c.get("Cuota Pendiente", 0) or 0) == 0)
         pendientes = [c for c in cuotas if (c.get("Cuota Pendiente", 0) or 0) > 0]
-        vencidas, prox_fecha = 0, None
+        vencidas, prox_fecha, prox_monto = 0, None, None
+        monto_vencido = 0.0
         for c in pendientes:
             f = parse_fecha_cuota(c)
+            pe = c.get("Cuota Pendiente", 0) or 0
             if f:
                 if f < hoy:
                     vencidas += 1
+                    monto_vencido += pe
                 if prox_fecha is None or f < prox_fecha:
                     prox_fecha = f
+                    prox_monto = pe
         if not pendientes:
             categoria = "realizados"
         elif vencidas > 0:
@@ -68,6 +72,7 @@ def agrupar_deuda(detalle: list[dict], hoy: date | None = None) -> dict:
         out.append({
             **g, "pendiente": pendiente, "pagado": pagado, "pagas": pagas,
             "pend_count": len(pendientes), "vencidas": vencidas,
+            "monto_vencido": monto_vencido, "proxima_cuota": prox_monto,
             "total_cuotas": len(cuotas), "categoria": categoria,
             "proxima_fecha": prox_fecha, "dias_proximo": dias_prox,
         })
